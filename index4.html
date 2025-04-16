@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tebak Suara Hewan A–Z</title>
+  <style>
+    body { font-family: sans-serif; background: #e1f5fe; text-align: center; padding: 20px; }
+    h1 { color: #0277bd; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 300px; margin: 20px auto; }
+    button { padding: 16px; font-size: 22px; background: #4fc3f7; color: white; border: none; border-radius: 10px; cursor: pointer; }
+    button:hover { background: #0288d1; }
+    #feedback { font-size: 26px; margin: 10px; height: 32px; }
+    #animal-img { margin-top: 15px; width: 280px; border-radius: 12px; display: none; }
+    #animal-name { font-size: 28px; margin-top: 10px; color: #00695c; display: none; }
+    #next-btn { display: none; margin-top: 20px; background: #66bb6a; }
+    .score { margin: 10px 0; font-size: 20px; color: #444; }
+  </style>
+</head>
+<body>
+  <h1>🎵 Tebak Suara Hewan (A–Z)</h1>
+  <div class="score">✅ Benar: <span id="score-correct">0</span> | ❌ Salah: <span id="score-wrong">0</span></div>
+  <button onclick="playAnimal()">🔊 Putar Suara</button>
+  <div class="grid" id="options"></div>
+  <div id="feedback"></div>
+  <img id="animal-img" />
+  <div id="animal-name"></div>
+  <button id="next-btn" onclick="nextAnimal()">➡️ Tebak Hewan Lain</button>
+  <audio id="animal-sound"></audio>
+  <audio id="correct" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+  <audio id="wrong" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+  <script>
+    const allAnimals = [
+      {name:"Ayam",img:"https://i.imgur.com/e1GEdRQ.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_ayam.mp3"},
+      {name:"Bebek",img:"https://i.imgur.com/IgMmUbG.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_bebek.mp3"},
+      {name:"Cicak",img:"https://i.imgur.com/7fzCAUw.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_cicak.mp3"},
+      {name:"Domba",img:"https://i.imgur.com/ND6iJT8.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_domba.mp3"},
+      {name:"Elang",img:"https://i.imgur.com/ne3bdEZ.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_elang.mp3"},
+      {name:"Gajah",img:"https://i.imgur.com/luUssVm.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_gajah.mp3"},
+      {name:"Harimau",img:"https://i.imgur.com/1JYKdWW.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_harimau.mp3"},
+      {name:"Kucing",img:"https://i.imgur.com/TsQamLf.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_kucing.mp3"},
+      {name:"Lalat",img:"https://i.imgur.com/9nyFhSO.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_lalat.mp3"},
+      {name:"Monyet",img:"https://i.imgur.com/Kl8yrKP.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_monyet.mp3"},
+      {name:"Nyamuk",img:"https://i.imgur.com/gVYL0KE.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_nyamuk.mp3"},
+      {name:"Orangutan",img:"https://i.imgur.com/kXH5YiJ.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_orangutan.mp3"},
+      {name:"Panda",img:"https://i.imgur.com/TitP85p.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_panda.mp3"},
+      {name:"Rusa",img:"https://i.imgur.com/Z6jMH2t.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_rusa.mp3"},
+      {name:"Serigala",img:"https://i.imgur.com/yhPIWtE.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_serigala.mp3"},
+      {name:"Tikus",img:"https://i.imgur.com/NdHmn9f.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_tikus.mp3"},
+      {name:"Viper",img:"https://i.imgur.com/JhmtiqB.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_viper.mp3"},
+      {name:"Walrus",img:"https://i.imgur.com/1xRO9rx.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_walrus.mp3"},
+      {name:"Xerus",img:"https://i.imgur.com/JiGlHAn.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_xerus.mp3"},
+      {name:"Yak",img:"https://i.imgur.com/tjbTXSJ.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_yak.mp3"},
+      {name:"Zebra",img:"https://i.imgur.com/jFHd41i.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_zebra.mp3"}
+    ];
+
+    let animals = [...allAnimals];
+    let currentAnimal;
+    let correct = 0;
+    let wrong = 0;
+
+    const options = document.getElementById("options");
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    function nextAnimal() {
+      if (animals.length === 0) {
+        alert("Kuis selesai! ✅ " + correct + " benar, ❌ " + wrong + " salah.");
+        return;
+      }
+
+      shuffleArray(animals);
+      currentAnimal = animals.pop();
+
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("animal-img").style.display = "none";
+      document.getElementById("animal-name").style.display = "none";
+      document.getElementById("next-btn").style.display = "none";
+      generateOptions();
+      playAnimal();
+    }
+
+    function playAnimal() {
+      const sound = document.getElementById("animal-sound");
+      sound.src = currentAnimal.sound;
+      sound.play();
+    }
+
+    function checkAnswer(name) {
+      const fb = document.getElementById("feedback");
+      const img = document.getElementById("animal-img");
+      const label = document.getElementById("animal-name");
+      const nextBtn = document.getElementById("next-btn");
+
+      if (name === currentAnimal.name) {
+        fb.textContent = "✔️ Benar!";
+        fb.style.color = "green";
+        correct++;
+        document.getElementById("correct").play();
+      } else {
+        fb.textContent = "❌ Salah! Jawaban yang benar: " + currentAnimal.name;
+        fb.style.color = "red";
+        wrong++;
+        document.getElementById("wrong").play();
+      }
+
+      document.getElementById("score-correct").textContent = correct;
+      document.getElementById("score-wrong").textContent = wrong;
+
+      img.src = currentAnimal.img;
+      img.style.display = "block";
+      label.textContent = currentAnimal.name;
+      label.style.display = "block";
+      playAnimal();
+      nextBtn.style.display = "inline-block";
+    }
+
+    function generateOptions() {
+      options.innerHTML = "";
+      let choices = [currentAnimal.name];
+      while (choices.length < 4) {
+        let r = allAnimals[Math.floor(Math.random() * allAnimals.length)].name;
+        if (!choices.includes(r)) choices.push(r);
+      }
+      shuffleArray(choices);
+      choices.forEach(name => {
+        const btn = document.createElement("button");
+        btn.textContent = name;
+        btn.onclick = () => checkAnswer(name);
+        options.appendChild(btn);
+      });
+    }
+
+    nextAnimal();
+  </script>
+</body>
+</html>
