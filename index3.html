@@ -1,16 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kuis Suara Hewan A-Z</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tebak Suara Hewan A–Z</title>
   <style>
-    body { font-family: sans-serif; background: #f0f9ff; }
-    .correct { background-color: #4ade80 !important; }
-    .wrong { background-color: #f87171 !important; }
-    </style>
+    body { font-family: sans-serif; background: #e1f5fe; text-align: center; padding: 20px; }
+    h1 { color: #0277bd; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 300px; margin: 20px auto; }
+    button { padding: 16px; font-size: 22px; background: #4fc3f7; color: white; border: none; border-radius: 10px; cursor: pointer; }
+    button:hover { background: #0288d1; }
+    #feedback { font-size: 26px; margin: 10px; height: 32px; }
+    #animal-img { margin-top: 15px; width: 280px; border-radius: 12px; display: none; }
+    #animal-name { font-size: 28px; margin-top: 10px; color: #00695c; display: none; }
+    #next-btn { display: none; margin-top: 20px; background: #66bb6a; }
+  </style>
 </head>
 <body>
   <h1>🎵 Tebak Suara Hewan (A–Z)</h1>
@@ -24,273 +28,90 @@
   <audio id="correct" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
   <audio id="wrong" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
 
-  </style>
-</head>
-<body class="text-center p-4">
-  <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-6">
-    <h1 class="text-3xl font-bold text-blue-600 mb-4">🎵 Kuis Suara Hewan A–Z</h1>
-    <p class="text-gray-600 mb-4">Dengarkan suaranya dan pilih nama hewannya!</p>
-    <button id="play-btn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">🔊 Putar Suara</button>
-    
-    <div class="flex justify-between mb-4 text-indigo-700 font-semibold">
-      <div>✅ Benar: <span id="score-correct">0</span></div>
-      <div>❌ Salah: <span id="score-wrong">0</span></div>
-    </div>
-    <div class="grid grid-cols-2 gap-4" id="option-buttons"></div>
-    
-    <div id="feedback" class="mt-4 text-xl font-semibold"></div>
-    <img id="animal-img" class="w-60 mx-auto my-4 hidden rounded-lg shadow-md"/>
-    <div id="animal-name" class="text-2xl font-bold text-green-700 mb-4"></div>
-    <button id="next-btn" class="bg-green-500 text-white font-bold py-2 px-4 rounded hidden">➡️ Hewan Selanjutnya</button>
-  </div>
-  <audio id="sound-player"></audio>
   <script>
-    function shuffleOptions(correct) {
-      const options = [correct];
-      const names = 21 > 0 ? ['Ayam', 'Bebek', 'Cicak', 'Domba', 'Elang', 'Gajah', 'Harimau', 'Kucing', 'Lalat', 'Monyet', 'Nyamuk', 'Orangutan', 'Panda', 'Rusa', 'Singa', 'Tikus', 'Viper', 'Walrus', 'Xerus', 'Yak', 'Zebra'] : [];
-      while (options.length < 4) {
-        const rand = names[Math.floor(Math.random() * names.length)];
-        if (!options.includes(rand)) options.push(rand);
-      }
-      return options.sort(() => 0.5 - Math.random());
-    }
-
     const animals = [
-      {
-      name: "Ayam",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_ayam.mp3",
-      image: "https://i.imgur.com/e1GEdRQ.jpeg",
-      hint: "Berkokok tiap pagi",
-      options: shuffleOptions("Ayam")
-    },
-{
-      name: "Bebek",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_bebek.mp3",
-      image: "https://i.imgur.com/IgMmUbG.jpeg",
-      hint: "Suka berenang dan bersuara kwek",
-      options: shuffleOptions("Bebek")
-    },
-{
-      name: "Cicak",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_cicak.mp3",
-      image: "https://i.imgur.com/7fzCAUw.jpeg",
-      hint: "Menempel di dinding",
-      options: shuffleOptions("Cicak")
-    },
-{
-      name: "Domba",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_domba.mp3",
-      image: "https://i.imgur.com/ND6iJT8.jpeg",
-      hint: "Berbulu tebal dan mengembik",
-      options: shuffleOptions("Domba")
-    },
-{
-      name: "Elang",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_elang.mp3",
-      image: "https://i.imgur.com/ne3bdEZ.jpeg",
-      hint: "Burung pemangsa yang tajam penglihatan",
-      options: shuffleOptions("Elang")
-    },
-{
-      name: "Gajah",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_gajah.mp3",
-      image: "https://i.imgur.com/luUssVm.jpeg",
-      hint: "Hewan besar dengan belalai",
-      options: shuffleOptions("Gajah")
-    },
-{
-      name: "Harimau",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_harimau.mp3",
-      image: "https://i.imgur.com/1JYKdWW.jpeg",
-      hint: "Kucing besar bergaris hitam",
-      options: shuffleOptions("Harimau")
-    },
-{
-      name: "Kucing",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_kucing.mp3",
-      image: "https://i.imgur.com/TsQamLf.jpeg",
-      hint: "Suka mengeong dan manja",
-      options: shuffleOptions("Kucing")
-    },
-{
-      name: "Lalat",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_lalat.mp3",
-      image: "https://i.imgur.com/9nyFhSO.jpeg",
-      hint: "Sering hinggap di makanan",
-      options: shuffleOptions("Lalat")
-    },
-{
-      name: "Monyet",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_monyet.mp3",
-      image: "https://i.imgur.com/Kl8yrKP.jpeg",
-      hint: "Pintar dan suka bergelantungan",
-      options: shuffleOptions("Monyet")
-    },
-{
-      name: "Nyamuk",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_nyamuk.mp3",
-      image: "https://i.imgur.com/gVYL0KE.jpeg",
-      hint: "Suka menggigit dan berdengung",
-      options: shuffleOptions("Nyamuk")
-    },
-{
-      name: "Orangutan",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_orangutan.mp3",
-      image: "https://i.imgur.com/kXH5YiJ.jpeg",
-      hint: "Primata besar dari Kalimantan",
-      options: shuffleOptions("Orangutan")
-    },
-{
-      name: "Panda",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_panda.mp3",
-      image: "https://i.imgur.com/TitP85p.jpeg",
-      hint: "Lucu, suka makan bambu",
-      options: shuffleOptions("Panda")
-    },
-{
-      name: "Rusa",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_rusa.mp3",
-      image: "https://i.imgur.com/Z6jMH2t.jpeg",
-      hint: "Hewan bertanduk pelari cepat",
-      options: shuffleOptions("Rusa")
-    },
-{
-      name: "Singa",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_sapi.mp3",
-      image: "https://i.imgur.com/pgew3a4.jpeg",
-      hint: "Raja hutan dengan auman keras",
-      options: shuffleOptions("Singa")
-    },
-{
-      name: "Tikus",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_tikus.mp3",
-      image: "https://i.imgur.com/NdHmn9f.jpeg",
-      hint: "Kecil, cepat, suka ke dapur",
-      options: shuffleOptions("Tikus")
-    },
-{
-      name: "Viper",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_viper.mp3",
-      image: "https://i.imgur.com/JhmtiqB.jpeg",
-      hint: "Ular berbisa",
-      options: shuffleOptions("Viper")
-    },
-{
-      name: "Walrus",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_walrus.mp3",
-      image: "https://i.imgur.com/1xRO9rx.jpeg",
-      hint: "Punya gading dan hidup di es",
-      options: shuffleOptions("Walrus")
-    },
-{
-      name: "Xerus",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_xerus.mp3",
-      image: "https://i.imgur.com/JiGlHAn.jpeg",
-      hint: "Tupai tanah dari Afrika",
-      options: shuffleOptions("Xerus")
-    },
-{
-      name: "Yak",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_yak.mp3",
-      image: "https://i.imgur.com/tjbTXSJ.jpeg",
-      hint: "Sapi gunung berbulu tebal",
-      options: shuffleOptions("Yak")
-    },
-{
-      name: "Zebra",
-      sound: "https://raw.githubusercontent.com/agustasix/level-2/main/suara_zebra.mp3",
-      image: "https://i.imgur.com/jFHd41i.jpeg",
-      hint: "Bergaris hitam putih",
-      options: shuffleOptions("Zebra")
-    }
+      {name:"Ayam",img:"https://i.imgur.com/e1GEdRQ.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_ayam.mp3"},
+      {name:"Bebek",img:"https://i.imgur.com/IgMmUbG.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_bebek.mp3"},
+      {name:"Cicak",img:"https://i.imgur.com/7fzCAUw.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_cicak.mp3"},
+      {name:"Domba",img:"https://i.imgur.com/ND6iJT8.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_domba.mp3"},
+      {name:"Elang",img:"https://i.imgur.com/ne3bdEZ.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_elang.mp3"},
+      {name:"Gajah",img:"https://i.imgur.com/luUssVm.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_gajah.mp3"},
+      {name:"Harimau",img:"https://i.imgur.com/1JYKdWW.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_harimau.mp3"},
+      {name:"Kucing",img:"https://i.imgur.com/TsQamLf.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_kucing.mp3"},
+      {name:"Lalat",img:"https://i.imgur.com/9nyFhSO.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_lalat.mp3"},
+      {name:"Monyet",img:"https://i.imgur.com/Kl8yrKP.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_monyet.mp3"},
+      {name:"Nyamuk",img:"https://i.imgur.com/gVYL0KE.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_nyamuk.mp3"},
+      {name:"Orangutan",img:"https://i.imgur.com/kXH5YiJ.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_orangutan.mp3"},
+      {name:"Panda",img:"https://i.imgur.com/TitP85p.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_panda.mp3"},
+      {name:"Rusa",img:"https://i.imgur.com/Z6jMH2t.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_rusa.mp3"},
+      {name:"Singa",img:"https://i.imgur.com/pgew3a4.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_sapi.mp3"},
+      {name:"Tikus",img:"https://i.imgur.com/NdHmn9f.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_tikus.mp3"},
+      {name:"Viper",img:"https://i.imgur.com/JhmtiqB.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_viper.mp3"},
+      {name:"Walrus",img:"https://i.imgur.com/1xRO9rx.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_walrus.mp3"},
+      {name:"Xerus",img:"https://i.imgur.com/JiGlHAn.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_xerus.mp3"},
+      {name:"Yak",img:"https://i.imgur.com/tjbTXSJ.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_yak.mp3"},
+      {name:"Zebra",img:"https://i.imgur.com/jFHd41i.jpeg",sound:"https://raw.githubusercontent.com/agustasix/level-2/main/suara_zebra.mp3"}
     ];
-    
-    // Shuffle array utility
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
+
+    let currentAnimal;
+    const options = document.getElementById("options");
+
+    function nextAnimal() {
+      currentAnimal = animals[Math.floor(Math.random() * animals.length)];
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("animal-img").style.display = "none";
+      document.getElementById("animal-name").style.display = "none";
+      document.getElementById("next-btn").style.display = "none";
+      generateOptions();
+      playAnimal();
     }
 
-    shuffleArray(animals);
-    let index = 0;
-    let scoreCorrect = 0;
-    let scoreWrong = 0;
-    
-    let current = animals[index];
+    function playAnimal() {
+      const sound = document.getElementById("animal-sound");
+      sound.src = currentAnimal.sound;
+      sound.play();
+    }
 
-    const playBtn = document.getElementById("play-btn");
-    const nextBtn = document.getElementById("next-btn");
-    const feedback = document.getElementById("feedback");
-    const animalImg = document.getElementById("animal-img");
-    const animalName = document.getElementById("animal-name");
-    const buttonsDiv = document.getElementById("option-buttons");
-    const soundPlayer = document.getElementById("sound-player");
+    function checkAnswer(name) {
+      const fb = document.getElementById("feedback");
+      const img = document.getElementById("animal-img");
+      const label = document.getElementById("animal-name");
+      const nextBtn = document.getElementById("next-btn");
 
-    function loadAnimal() {
-      current = animals[index];
-      feedback.textContent = "";
-      animalImg.classList.add("hidden");
-      animalName.textContent = "";
-      animalName.classList.add("hidden");
-      nextBtn.classList.add("hidden");
-      buttonsDiv.innerHTML = "";
-      current.options.forEach(opt => {
+      if (name === currentAnimal.name) {
+        fb.textContent = "✔️ Benar!";
+        fb.style.color = "green";
+        document.getElementById("correct").play();
+      } else {
+        fb.textContent = "❌ Salah! Jawaban yang benar: " + currentAnimal.name;
+        fb.style.color = "red";
+        document.getElementById("wrong").play();
+      }
+
+      img.src = currentAnimal.img;
+      img.style.display = "block";
+      label.textContent = currentAnimal.name;
+      label.style.display = "block";
+      playAnimal();
+      nextBtn.style.display = "inline-block";
+    }
+
+    function generateOptions() {
+      options.innerHTML = "";
+      let choices = [currentAnimal.name];
+      while (choices.length < 4) {
+        let r = animals[Math.floor(Math.random() * animals.length)].name;
+        if (!choices.includes(r)) choices.push(r);
+      }
+      choices.sort().forEach(name => {
         const btn = document.createElement("button");
-        btn.textContent = opt;
-        btn.className = "bg-blue-200 hover:bg-blue-400 font-bold py-2 px-4 rounded transition";
-        btn.onclick = () => checkAnswer(btn, opt);
-        buttonsDiv.appendChild(btn);
+        btn.textContent = name;
+        btn.onclick = () => checkAnswer(name);
+        options.appendChild(btn);
       });
     }
 
-    function checkAnswer(button, choice) {
-      const correct = choice === current.name;
-      if (correct) {
-        button.classList.add("correct");
-        
-        feedback.textContent = "✅ Benar!";
-        scoreCorrect++;
-        document.getElementById("score-correct").textContent = scoreCorrect;
-    
-        animalImg.src = current.image;
-        animalImg.classList.remove("hidden");
-        animalName.textContent = current.name;
-        animalName.classList.remove("hidden");
-        soundPlayer.src = current.sound;
-        soundPlayer.play();
-        nextBtn.classList.remove("hidden");
-      } else {
-        button.classList.add("wrong");
-        
-        feedback.textContent = "❌ Salah! Jawaban benar: " + current.name;
-        animalImg.src = current.image;
-        animalImg.classList.remove("hidden");
-        animalName.textContent = current.name;
-        animalName.classList.remove("hidden");
-        soundPlayer.src = current.sound;
-        soundPlayer.play();
-        scoreWrong++;
-        document.getElementById("score-wrong").textContent = scoreWrong;
-        nextBtn.classList.remove("hidden");
-    
-      }
-      Array.from(buttonsDiv.children).forEach(b => b.disabled = true);
-    }
-
-    nextBtn.onclick = () => {
-      index = (index + 1) % animals.length;
-      animals[index].options = shuffleOptions(animals[index].name);
-      loadAnimal();
-    };
-
-    playBtn.onclick = () => {
-      soundPlayer.src = current.sound;
-      soundPlayer.play();
-    };
-
-    loadAnimal();
+    nextAnimal();
   </script>
 </body>
 </html>
